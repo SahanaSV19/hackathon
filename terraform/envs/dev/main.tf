@@ -63,6 +63,7 @@ resource "aws_eip" "nat" {
     Name        = "hackathon-nat-eip-${var.env_name}"
     Environment = var.env_name
   }
+  depends_on = [aws_internet_gateway.igw]
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -128,7 +129,7 @@ resource "aws_security_group" "jenkins_sg" {
 resource "aws_instance" "jenkins" {
   ami                    = var.ec2_jenkins_ami
   instance_type          = var.ec2_instance_type
-  key_name               = "build"                                 # keep your key
+  key_name               = var.ssh_key_name                                 # keep your key
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   subnet_id              = aws_subnet.public[0].id
   associate_public_ip_address = true
@@ -169,7 +170,7 @@ resource "aws_instance" "bastion" {
   subnet_id                   = aws_subnet.public[0].id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
-  key_name                    = "build"
+  key_name                    = var.ssh_key_name
   tags = {
     Name        = "Bastion-Host-${var.env_name}"
     Environment = var.env_name
@@ -193,7 +194,7 @@ module "eks" {
   version = "20.24.0"
 
   cluster_name    = "${var.eks_cluster_name}-${var.env_name}"
-  cluster_version = "1.29"
+  cluster_version = "1.28"
 
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = false
@@ -246,6 +247,19 @@ resource "aws_eks_fargate_profile" "kube_system" {
     namespace = "kube-system"
     
   }
+}
+resource "kubernetes_namespace" "patient" {
+  metadata {
+    name = "patient"
+  }
+  depends_on = [module.eks]
+}
+
+resource "kubernetes_namespace" "appointments" {
+  metadata {
+    name = "appointments"
+  }
+  depends_on = [module.eks]
 }
 
 # Fargate profile for default and app namespaces

@@ -27,3 +27,9 @@ variable "ec2_jenkins_ami" {
 variable "ec2_instance_type" {
   default = "t3.medium"
 }
+
+variable "ssh_key_name" {
+  description = "SSH key pair name"
+  type        = string
+  default     = "build"
+}
