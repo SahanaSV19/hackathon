@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /patient
+            pathType: Prefix
+            backend:
+              service:
+                name: patient-service
+                port:
+                  number: 80
+          - path: /appointment
+            pathType: Prefix
+            backend:
+              service:
+                name: appointment-service
+                port:
+                  number: 80

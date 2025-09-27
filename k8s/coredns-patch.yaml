@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: kube-system
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      k8s-app: kube-dns
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-dns
+    spec:
+      serviceAccountName: coredns
+      nodeSelector:
+        eks.amazonaws.com/compute-type: fargate
+      containers:
+      - name: coredns
+        image: 602401143452.dkr.ecr.us-east-1.amazonaws.com/eks/coredns:v1.11.1-eksbuild.4
+        resources:
+          limits:
+            memory: 170Mi
+          requests:
+            cpu: 100m
+            memory: 70Mi
