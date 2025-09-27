@@ -1,0 +1,17 @@
+# Terraform local cache
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.lock.hcl
+
+# Provider binaries
+*.exe
+
+# Ignore terraform state backups
+**/.terraform/*
+**/*.tfstate
+**/*.tfstate.backup
+
+# Ignore prod and staging envs for now
+terraform/envs/prod/
+terraform/envs/staging/
